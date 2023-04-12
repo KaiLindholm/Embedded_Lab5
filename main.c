@@ -19,7 +19,7 @@ int main(void) {
 	
 	uart_send_string(str);
     while (1) {	
-		if(uart_get_buffer_head()>0){
+		if(uart_get_buffer_size()>0){
 			uint8_t data = uart_read_buffer();
 			uart_send_byte(data);
 		}

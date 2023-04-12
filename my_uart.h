@@ -2,7 +2,7 @@
  * uart.h
  *
  * Created: 4/11/2023 9:20:27 PM
- *  Author: kaili
+ *  Author:  Kai Lindholm & James Ostrowski
  */ 
 
 

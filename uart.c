@@ -2,12 +2,11 @@
  * uart.c
  *
  * Created: 4/11/2023 9:19:17 PM
- *  Author: kaili
+ *  Author:  Kai Lindholm & James Ostrowski
  */ 
 #include "my_uart.h"
 
 #define MAX_BUFFER_SIZE 128
-#define F_CPU 16000000
 
 volatile static uint8_t uart_tx_busy = 1;
 UARTBuffer uart_buffer; 

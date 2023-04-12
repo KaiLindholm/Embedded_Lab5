@@ -37,6 +37,7 @@ int main(void) {
 				float result = (ADC*5.0)/1024;
 	   			unsigned char buffer[6];
 				dtostrf(result, 3, 2, buffer);
+				
 				unsigned char header[] = "V = ";
 				uart_send_string(header);
 				uart_send_string(buffer);

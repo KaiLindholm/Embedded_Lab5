@@ -6,22 +6,22 @@
  */ 
 #include "my_uart.h"
 
-BUFFER_SIZE
+#define MAX_BUFFER_SIZE 128
+#define F_CPU 16000000
 
-
-volatile static uint8_t rx_buffer[BUFFER_SIZE];	// Initialize as all 0s
-volatile static uint16_t rx_count = 0;
+volatile static uint8_t rx_buffer[MAX_BUFFER_SIZE] = {0};	// Initialize as all 0s
+volatile static uint16_t buffer_head = 0;
 volatile static uint8_t uart_tx_busy = 1;
 
 ISR(USART_RX_vect){
+	volatile static uint16_t write_pos = 0;		
 	
-	volatile static uint16_t rx_pos = 0; 
+	rx_buffer[write_pos] = UDR0;			 // read in the UDR0 register 
+	buffer_head++;					// declares the size of the queue
+	write_pos++;							// increment the position to write new data
 	
-	rx_buffer[rx_pos] = UDR0;			 // read in the UDR0 register 
-	rx_count++; 
-	rx_pos++; 
-	if (rx_pos >= BUFFER_SIZE){		// if the rx position overruns the rx max buffer size. return rx pos to 0. "Circular FIFO data structure as stated in the datasheet"
-		rx_pos = 0; 
+	if (write_pos >= MAX_BUFFER_SIZE){		// if the rx position overruns the rx max buffer size. return rx pos to 0. "Circular FIFO data structure as stated in the datasheet"
+		write_pos = 0; 
 	}
 	
 }
@@ -41,11 +41,11 @@ void uart_init(uint32_t baud){
 }
 
 
-void uart_send_byte(uint8_t byte){
+void uart_send_byte(uint8_t data){
 	while(uart_tx_busy == 0); // while UART is not transmitting
 	
 	uart_tx_busy = 0; 
-	UDR0 = byte;				// load byte passed into the function to the buffer
+	UDR0 = data;				// load byte passed into the function to the uart buffer
 }
 
 void uart_send_array(uint8_t *arr, uint16_t len){
@@ -59,25 +59,24 @@ void uart_send_string(uint8_t *arr) {
 	
 	do {
 		uart_send_byte(arr[i]);
-		++i;
+		i++;
 	} while(arr[i] != '\0');
 	uart_send_byte(arr[i]);
 
 }
 
-uint16_t uart_read_count(void){
-	return rx_count;
+uint16_t uart_get_buffer_head(void){
+	return buffer_head;
 }
 
-uint8_t uart_read(void){
-	static uint16_t rx_pos = 0; 
-	uint8_t data = 0; 
-	
-	data = rx_buffer[rx_pos];
-	rx_pos++; 
-	rx_count--; 
-	if(rx_pos >= BUFFER_SIZE){
-		rx_pos = 0; 
+uint8_t uart_read_buffer(void){
+	static uint16_t read_pos = 0;
+	uint8_t data = rx_buffer[read_pos];		// pull the data out of the buffer at the 
+	read_pos++;								
+	buffer_head--;							// decrement the head of the list, to point to newest unread data. 
+	if(read_pos >= MAX_BUFFER_SIZE){		// reading has gone past the buffers size. move to tail of buffer to extract new data
+		read_pos = 0; 
 	}
+	
 	return data;
 }

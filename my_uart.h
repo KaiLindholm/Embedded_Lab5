@@ -8,6 +8,7 @@
 
 #ifndef MY_UART_H_
 #define MY_UART_H_
+#define F_CPU 16000000
 
 #include <stdint.h>
 #include <avr/io.h>
@@ -16,7 +17,7 @@
 #define BUFFER_SIZE 128
 
 typedef struct UARTBuffer {
-	uint8_t buffer[BUFFER_SIZE];  // buffer of size BUFFER_SIZE initally all zeroes
+	uint8_t buffer[BUFFER_SIZE];  // buffer of size BUFFER_SIZE initially all zeros
 	uint16_t size;      // the amount of data in the buffer.
 	uint16_t head;		// head is the front of the buffer queue. wraps around to
 	uint16_t tail;		// tail is incremented and where data is read from.

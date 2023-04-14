@@ -11,10 +11,12 @@
 #define F_CPU 16000000
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #define BUFFER_SIZE 128
+#define MAX_COMMAND_STR_SIZE 60
 
 typedef struct UARTBuffer {
 	uint8_t buffer[BUFFER_SIZE];  // buffer of size BUFFER_SIZE initially all zeros
@@ -26,12 +28,15 @@ typedef struct UARTBuffer {
 extern UARTBuffer uart_buffer;
 
 void uart_init(uint32_t baud);
-void uart_send_byte(uint8_t byte);
-void uart_send_array(uint8_t *arr, uint16_t len);
-void uart_send_string(uint8_t *arr);
+void uart_send_byte(char byte);
+void uart_send_string(char *arr);
 
+char * uart_get_string();
+uint8_t uart_string_complete();
 
 uint16_t uart_get_buffer_size(void);
 uint8_t uart_read_buffer(void);
+
+char * uart_get_command(void);
 
 #endif /* MY_UART_H_ */

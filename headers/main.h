@@ -22,7 +22,8 @@ typedef enum Commands {
 } Commands;
 
 
-void get_adc_value();
+char * get_adc_value();
+void print_adc_value(char * buffer);
 void setup();
 int main(void);
 void read_command(char * command);

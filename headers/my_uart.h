@@ -8,13 +8,13 @@
 
 #ifndef MY_UART_H_
 #define MY_UART_H_
-#define F_CPU 16000000
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include "config.h"
 #define BUFFER_SIZE 128
 #define MAX_COMMAND_STR_SIZE 60
 

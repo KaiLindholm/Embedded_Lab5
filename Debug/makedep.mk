@@ -2,9 +2,9 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-i2c\i2c.c
+src\main.c
 
-main.c
+src\uart.c
 
-uart.c
+twi\twi_hal.c
 

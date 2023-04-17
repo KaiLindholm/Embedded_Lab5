@@ -16,14 +16,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef enum Commands {
-	NONE = 0,
-	ADCREAD = 1,
-	DACOUTPUT = 2,
-	GENERATE = 3
-} Commands;
-
-
 char * get_adc_value();
 void print_adc_value(char * buffer);
 void setup();

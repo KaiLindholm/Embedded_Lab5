@@ -14,7 +14,9 @@ UARTBuffer uart_buffer;
 
 ISR(USART_RX_vect){
 	if (UDR0 == '\n' || UDR0 == '\r') { // if a newline or carriage return is received
-		uart_fetch_complete = 1;
+		if(uart_get_buffer_size() > 0){
+			uart_fetch_complete = 1;
+		}
 	} else {
 		uart_buffer.buffer[uart_buffer.head] = UDR0;			 // read in the UDR0 register
 		uart_buffer.head++;
@@ -63,16 +65,16 @@ void uart_send_string(char *arr) {
 		uart_send_byte(arr[i]);
 		i++;
 	} while(arr[i] != '\0');
-
 }
 
 uint16_t uart_get_buffer_size(void){
 	return uart_buffer.size;
 }
+
 char * uart_get_command(void) {
 	uart_fetch_complete = 0; 
 	uint16_t size = uart_get_buffer_size();
-	char * command = (char *) malloc((size +1) * sizeof(char));
+	char * command = (char *) malloc((size + 1) * sizeof(char));
 	uint8_t i = 0;
 	while(uart_get_buffer_size() > 0){
 		command[i] = uart_read_buffer();		// 

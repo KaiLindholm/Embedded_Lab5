@@ -5,14 +5,14 @@
 
 void read_command(char * command);
 void Gcommand();
-void Wcommand(char * x, char * y, char * z);
-void Scommand(char * x, char * y);
+void Wcommand(uint8_t dac, uint8_t freq, uint8_t cycles);
+void Scommand(uint8_t dac, float voltage);
 
 int main(void)
 {
-    char * c = "G";
-	char * w = "W,1,2,3";
-	char * s = "S,1,2";
+    char c[2] = "G\0";
+	char w[8] = "W,1,2,3\0";
+	char s[6] = "S,1,2\0";
     read_command(c);
 	printf("\n");
 	read_command(w);
@@ -23,66 +23,38 @@ int main(void)
 
 
 void read_command(char * command) {
-	char * buffer = (char*)malloc(strlen(command) + 1);
-	strcpy(buffer, command);
 	char delim[] = ",";
-	char * token = strtok(buffer, delim);
-	char * temp[4];
-	int num = 0;
+	char * token = strtok(command, delim);
 	if(strcmp(token, "G") == 0){
 		token = strtok(NULL, delim);
 		Gcommand();
-		printf("G");
+		printf("G\n");
 	}else if(strcmp(token, "W") == 0){
-		token = strtok(NULL, delim);
-		while(token != NULL && num < 4){
-			temp[num] = (char *)malloc(strlen(token)+1);
-			strcpy(temp[num], token);
-			num++;
-			token = strtok(NULL, delim);
-		}
-		num = 0;
-		Wcommand(temp[0], temp[1], temp[2]);
-		for(int i = 0; i < 3; i++){
-			free(temp[i]);
-		}
+		uint8_t dac = atoi(strtok(NULL, delim));
+		uint8_t freq = atoi(strtok(NULL, delim));
+		uint8_t cycles = atoi(strtok(NULL, delim));
+
+		Wcommand(dac, freq, cycles);
 	}else if(strcmp(token, "S") == 0){
-		token = strtok(NULL, delim);
-		while(token != NULL){
-			temp[num] = (char *)malloc(strlen(token)+1);
-			strcpy(temp[num], token);
-			num++;
-			token = strtok(NULL, delim);
-		}
-		num = 0;
-		Scommand(temp[0], temp[1]);
-		for(int i = 0; i < 2; i++){
-			free(temp[i]);
-		}
+		uint8_t dac = atoi(strtok(NULL, delim));
+		float voltage = atof(strtok(NULL, delim));
+		Scommand(dac, voltage);
 	}
-	free(command);
 }
 
 void Gcommand(){
 	//get_adc_value();
 }
 
-void Wcommand(char * c, char * f, char * r){
-	printf("W");
-	printf("\n");
-	int DAC = atoi(c);
-	int FREQ = atoi(f);
-	int WAVE = atoi(r);
-	printf("%d\n", DAC);
-	printf("%d\n", FREQ);
-	printf("%d\n", WAVE);
+void Wcommand(uint8_t dac, uint8_t freq, uint8_t cycles){
+	printf("W: ");
+	printf("%d ", dac);
+	printf(" %d ", freq);
+	printf(" %d\n", cycles);
 }
 
-void Scommand(char * c, char * v){
-	printf("S");
-	printf("\n");
-	int DAC = atoi(c);
-	float VOLT = atof(v);
-	printf("%d\n", DAC);
-	printf("%f\n", VOLT);
+void Scommand(uint8_t dac, float voltage){
+	printf("S: ");
+	printf(" %d ", dac);
+	printf(" %f", voltage);
 }

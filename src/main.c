@@ -12,6 +12,7 @@
 #include <util/delay.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "twi_hal.h"
 #include "my_uart.h"
@@ -25,11 +26,6 @@ void setup(){
 	ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0)| (1<<ADEN);
 	ADMUX = 0b00000000;   // clear ADMUX for ADC0 pin 
 	ADMUX |= (1<<REFS0); // setup internal reference voltage of 1.1V
-}
-
-uint8_t * read_wave_form_file(char * path){
-	FILE *fp; 
-	
 }
 
 int main(void) {
@@ -105,7 +101,7 @@ void read_command(char * command) {
 	free(command);
 }
 
-void set_adc_value(uint8_t dac, float voltage){
+void set_dac_output(uint8_t dac, float voltage){
 	
 }
 

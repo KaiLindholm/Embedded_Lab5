@@ -14,6 +14,8 @@
 #include <util/delay.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+
 typedef enum Commands {
 	NONE = 0,
 	ADCREAD = 1,
@@ -30,5 +32,4 @@ void read_command(char * command);
 void set_dac_output(uint8_t dac, float voltage);
 void gen_wave_form(uint8_t dac, uint8_t freq, uint8_t cycles); 
 
-uint8_t * read_wave_form_file(char * path);
 #endif /* MAIN_H_ */

@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define SIZE 1024
 
 void read_command(char * command);
 void Gcommand();
@@ -38,21 +37,9 @@ uint8_t read_wave_form_file(char * file_path){
 	}
 	
 
-	//fclose(fp);
+	fclose(fp);
 	return 0; 
 }
-
-
-int main(void)
-{
-    if(read_wave_form_file("sin_table.csv")){
-		printf("ERR\n");
-		return 1; 
-	}
-
-    return 0;
-}
-
 
 void read_command(char * command) {
 	char delim[] = ",";

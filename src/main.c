@@ -18,7 +18,7 @@
 #include "my_uart.h"
 #include "main.h"
 
-#define MAX518_ADDR 0b01000000
+#define MAX518_ADDR 0b01010000
 #define DAC0 0x00
 #define DAC1 0x01
 
@@ -93,22 +93,23 @@ void read_command(char * command) {
 }
 
 void set_dac_output(uint8_t dac, float voltage){
-	i2c_start(MAX518_ADDR + 0);     // send start signal to MAX518
+	i2c_start(MAX518_ADDR + 1);     // send start signal to MAX518
 	if(dac == 1 || dac == 0){
 		i2c_write(dac);                        // write to DAC0
 	}
+	if(voltage >= 0 && voltage <= 5){
+		i2c_write(voltage);                      // write voltage to dac0
+	}
 	
-	i2c_write(voltage);                      // write voltage to dac0
 	i2c_stop();
 }
 
 void gen_wave_form(uint8_t dac, uint8_t freq, uint8_t cycles){
 	uart_send_byte('W');
-	uint8_t * wave;
 	int i = 0; 
 	while( i < cycles){
 		for(int i =0; i < 64; ++i){
-			set_dac_output(dac, wave[i]);
+			set_dac_output(dac, wave_form[i]);
 		}
 		//_delay_ms(1/(freq*1000));
 		++i;

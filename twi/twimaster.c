@@ -76,9 +76,7 @@ void i2c_start_wait(unsigned char address)
 {
     uint8_t   twst;
 
-
-    while ( 1 )
-    {
+    while ( 1 ) {
 	    // send START condition
 	    TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
     

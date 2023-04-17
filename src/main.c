@@ -14,42 +14,32 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "twi_hal.h"
+#include "i2cmaster.h"
 #include "my_uart.h"
 #include "main.h"
 
-#define MAX518_Slave 0b01000000
+#define MAX518_ADDR 0b01000000
 #define DAC0 0x00
 #define DAC1 0x01
 
-void setup(){
+void setup(uint32_t scl_clock, uint32_t baud){
 	ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0)| (1<<ADEN);
 	ADMUX = 0b00000000;		// clear ADMUX for ADC0 pin 
 	ADMUX |= (1<<REFS0);	
+	i2c_init();
+	uart_init(baud);
 }
 
 int main(void) {
 	char str[] = "Started!";
-	uint8_t voltage = 0;
-	uint32_t speed = 100000;
-	uint32_t baud = 9600; 	 
-	char * adc; 
-	uint8_t err = 0; 
-	setup();
-	twi_init(speed);
-	uart_init(baud);
-
-	voltage = 100;
-	uint8_t data[1] = {voltage};
+	setup(100000, 9600);
 	sei();
-	adc = get_adc_value();  // initialize adc for faster future computations. 
-	
+
+	get_adc_value();  // initialize adc for faster future computations. 
+
 	uart_send_string(str);
-	uart_send_byte('\n');	
-	err = twi_wire(MAX518_Slave, DAC0, data, sizeof(data));
-	adc = get_adc_value();
-	print_adc_value(adc);
-	
+	uart_send_byte('\n');
+
 	while (1) {	
 		if(uart_string_complete()){
 			read_command(uart_get_command());
@@ -103,18 +93,24 @@ void read_command(char * command) {
 }
 
 void set_dac_output(uint8_t dac, float voltage){
+	i2c_start(MAX518_ADDR + 0);     // send start signal to MAX518
+	if(dac == 1 || dac == 0){
+		i2c_write(dac);                        // write to DAC0
+	}
 	
+	i2c_write(voltage);                      // write voltage to dac0
+	i2c_stop();
 }
 
 void gen_wave_form(uint8_t dac, uint8_t freq, uint8_t cycles){
 	uart_send_byte('W');
-	// set the frequency of I2C
 	uint8_t * wave;
 	int i = 0; 
 	while( i < cycles){
 		for(int i =0; i < 64; ++i){
 			set_dac_output(dac, wave[i]);
 		}
+		//_delay_ms(1/(freq*1000));
 		++i;
 	}
 }

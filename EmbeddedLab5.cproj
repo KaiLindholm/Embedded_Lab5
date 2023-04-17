@@ -148,6 +148,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="headers\config.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="headers\main.h">
       <SubType>compile</SubType>
     </Compile>
@@ -160,10 +163,10 @@
     <Compile Include="src\uart.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="twi\twi_hal.c">
+    <Compile Include="twi\i2cmaster.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="twi\twi_hal.h">
+    <Compile Include="twi\twimaster.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

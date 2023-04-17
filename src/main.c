@@ -27,6 +27,11 @@ void setup(){
 	ADMUX |= (1<<REFS0); // setup internal reference voltage of 1.1V
 }
 
+uint8_t * read_wave_form_file(char * path){
+	FILE *fp; 
+	
+}
+
 int main(void) {
 	char str[] = "Started!";
 	uint8_t voltage = 0;
@@ -79,20 +84,31 @@ void print_adc_value(char * buffer){
 	free(buffer); 
 }
 void read_command(char * command) {
-	if (command[0] == 'G'){
-		get_adc_value();
-	} else {
-		char delim[] = ",";
-		char * token = strtok(command, delim);
-		while(token != NULL){
-			if(token == 'G'){
-				get_adc_value();
-			}
-			//uart_send_string(token);
-			token = strtok(NULL, delim);
-	}
+	char delim[] = ",";
+	char * token = strtok(command, delim);
+	if(strcmp(token, "G") == 0){
+		token = strtok(NULL, delim);
+		print_adc_value(get_adc_value());
+		printf("G\n");
+		} else if(strcmp(token, "W") == 0) {
+		uint8_t dac = atoi(strtok(NULL, delim));
+		uint8_t freq = atoi(strtok(NULL, delim));
+		uint8_t cycles = atoi(strtok(NULL, delim));
+		gen_wave_form(dac, freq, cycles);
+		
+		} else if(strcmp(token, "S") == 0) {
+			uint8_t dac = atoi(strtok(NULL, delim));
+			float voltage = atof(strtok(NULL, delim));
+			set_dac_output(dac, voltage);
 	}
 	
 	free(command);
 }
 
+void set_adc_value(uint8_t dac, float voltage){
+	
+}
+
+void gen_wave_form(uint8_t dac, uint8_t freq, uint8_t cycles){
+	
+}

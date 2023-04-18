@@ -5,7 +5,9 @@
  * Author : Kai Lindholm & James Ostrowski
  */ 
 #include "config.h"
+#define F_CPU 16000000UL
 
+#define __DELAY_BACKWARD_COMPATIBLE__
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -18,7 +20,7 @@
 #include "my_uart.h"
 #include "main.h"
 
-#define MAX518_ADDR 0b01010000
+#define MAX518_ADDR 0b01011000
 #define DAC0 0x00
 #define DAC1 0x01
 
@@ -27,15 +29,16 @@ void setup(uint32_t scl_clock, uint32_t baud){
 	ADMUX = 0b00000000;		// clear ADMUX for ADC0 pin 
 	ADMUX |= (1<<REFS0);	
 	i2c_init();
-	uart_init(baud);
+
 }
 
 int main(void) {
 	char str[] = "Started!";
 	setup(100000, 9600);
+	uart_init(9600);
 	sei();
 
-	get_adc_value();  // initialize adc for faster future computations. 
+	//get_adc_value();  // initialize adc for faster future computations. 
 
 	uart_send_string(str);
 	uart_send_byte('\n');
@@ -84,7 +87,7 @@ void read_command(char * command) {
 	} else if(token[1] == 'S') {
 		uint8_t dac = atoi(strtok(NULL, delim));
 		float voltage = atof(strtok(NULL, delim));
-		set_dac_output(dac, voltage);
+		set_dac_output(dac, 51*voltage);
 	} else {
 		uart_send_byte('X');
 	}
@@ -92,26 +95,32 @@ void read_command(char * command) {
 	free(command);
 }
 
-void set_dac_output(uint8_t dac, float voltage){
-	i2c_start(MAX518_ADDR + 1);     // send start signal to MAX518
-	if(dac == 1 || dac == 0){
-		i2c_write(dac);                        // write to DAC0
+void set_dac_output(uint8_t dac, uint8_t voltage){
+	if(dac != 1 && dac != 0){
+		uart_send_string("DAC must either be 0 or 1");
 	}
-	if(voltage >= 0 && voltage <= 5){
-		i2c_write(voltage);                      // write voltage to dac0
-	}
+	//if(voltage < 0 || voltage > 5){
+	//	uart_send_string("Voltage must be bounded between 0 and 5");
+	//}
 	
+	i2c_start(MAX518_ADDR | I2C_WRITE);     // send start signal to MAX518
+	i2c_write(dac);                        // write to DAC0
+	i2c_write(voltage);                      // write voltage to dac0
 	i2c_stop();
 }
 
 void gen_wave_form(uint8_t dac, uint8_t freq, uint8_t cycles){
 	uart_send_byte('W');
 	int i = 0; 
+	double dt = 1000000.0 / freq / 64 - 300;
+
 	while( i < cycles){
-		for(int i =0; i < 64; ++i){
-			set_dac_output(dac, wave_form[i]);
+		for(int i = 0; i < 64; ++i){
+			uint8_t voltage = wave_form[i];
+			set_dac_output(dac,voltage);
+			_delay_us(dt);
+
 		}
-		//_delay_ms(1/(freq*1000));
 		++i;
 	}
 }

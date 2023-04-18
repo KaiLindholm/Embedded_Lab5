@@ -14,9 +14,7 @@ UARTBuffer uart_buffer;
 
 ISR(USART_RX_vect){
 	if (UDR0 == '\n' || UDR0 == '\r') { // if a newline or carriage return is received
-		if(uart_get_buffer_size() > 0){
-			uart_fetch_complete = 1;
-		}
+		uart_fetch_complete = 1;
 	} else {
 		uart_buffer.buffer[uart_buffer.head] = UDR0;			 // read in the UDR0 register
 		uart_buffer.head++;

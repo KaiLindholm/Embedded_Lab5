@@ -73,23 +73,23 @@ void print_adc_value(char * buffer){
 	free(buffer); 
 }
 void read_command(char * command) {
-	char delim[] = ",";
+	char delim[] = ",";  // set delimiter
 
 	char * token = strtok(command, delim);
-	if(token[1] == 'G'){
+	if(token[1] == 'G'){ //check commands
 		print_adc_value(get_adc_value());
-	} else if(token[1] == 'W') {
+	} else if(token[1] == 'W') { // get W parameters
 		uint8_t dac = atoi(strtok(NULL, delim));
 		uint8_t freq = atoi(strtok(NULL, delim));
 		uint8_t cycles = atoi(strtok(NULL, delim));
 	
 		gen_wave_form(dac, freq, cycles);
-	} else if(token[1] == 'S') {
+	} else if(token[1] == 'S') { // get S parameters
 		uint8_t dac = atoi(strtok(NULL, delim));
 		float voltage = atof(strtok(NULL, delim));
 		set_dac_output(dac, 51*voltage);
 	} else {
-		uart_send_byte('X');
+		uart_send_byte('X'); //if no correct commands entered
 	}
 	
 	free(command);
@@ -99,9 +99,6 @@ void set_dac_output(uint8_t dac, uint8_t voltage){
 	if(dac != 1 && dac != 0){
 		uart_send_string("DAC must either be 0 or 1");
 	}
-	//if(voltage < 0 || voltage > 5){
-	//	uart_send_string("Voltage must be bounded between 0 and 5");
-	//}
 	
 	i2c_start(MAX518_ADDR | I2C_WRITE);     // send start signal to MAX518
 	i2c_write(dac);                        // write to DAC0
@@ -112,12 +109,12 @@ void set_dac_output(uint8_t dac, uint8_t voltage){
 void gen_wave_form(uint8_t dac, uint8_t freq, uint8_t cycles){
 	uart_send_byte('W');
 	int i = 0; 
-	double dt = 1000000.0 / freq / 64 - 300;
+	double dt = 1000000.0 / freq / 64 - 300; //delay computation
 
-	while( i < cycles){
-		for(int i = 0; i < 64; ++i){
+	while( i < cycles){ //iterate through cycles
+		for(int i = 0; i < 64; ++i){ //move through waveform
 			uint8_t voltage = wave_form[i];
-			set_dac_output(dac,voltage);
+			set_dac_output(dac,voltage); //set voltage
 			_delay_us(dt);
 
 		}
